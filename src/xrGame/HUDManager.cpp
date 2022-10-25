@@ -384,3 +384,20 @@ CDialogHolder* CurrentDialogHolder()
 	else
 		return HUD().GetGameUI();
 }
+
+void CHUDManager::Render_Actor_Shadow() // added by KD
+{
+	if (pUIGame == nullptr) return;
+
+	auto object = g_pGameLevel->CurrentViewEntity();
+	if (object == nullptr) return;
+
+	auto actor = smart_cast<CActor*>(object);
+	if (!actor) return;
+
+	// KD: we need to render actor shadow only in first eye cam mode because
+	// in other modes actor model already in scene graph and renders well
+	if (actor->active_cam() != eacFirstEye) return;
+	::Render->set_Object(object->H_Root());
+	object->renderable_Render();
+}
