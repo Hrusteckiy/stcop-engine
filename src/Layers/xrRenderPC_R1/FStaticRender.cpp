@@ -428,7 +428,8 @@ void CRender::Calculate				()
 		}
 
 		// Traverse object database
-		if  (psDeviceFlags.test(rsDrawDynamic))	{
+		if  (psDeviceFlags.test(rsDrawDynamic))
+		{
 			g_SpatialSpace->q_frustum
 				(
 				lstRenderables,

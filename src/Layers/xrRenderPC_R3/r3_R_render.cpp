@@ -95,13 +95,16 @@ void CRender::render_main	(Fmatrix&	m_ViewProjection, bool _fportals)
 		//!!!
 		{
 			// Traverse object database
-			g_SpatialSpace->q_frustum
+			if (psDeviceFlags.test(rsDrawDynamic))
+			{
+				g_SpatialSpace->q_frustum
 				(
-				lstRenderables,
-				ISpatial_DB::O_ORDERED,
-				STYPE_RENDERABLE + STYPE_LIGHTSOURCE,
-				ViewBase
+					lstRenderables,
+					ISpatial_DB::O_ORDERED,
+					STYPE_RENDERABLE + STYPE_LIGHTSOURCE,
+					ViewBase
 				);
+			}
 
 			// (almost) Exact sorting order (front-to-back)
 			std::sort(lstRenderables.begin(),lstRenderables.end(),pred_sp_sort);
@@ -144,13 +147,16 @@ void CRender::render_main	(Fmatrix&	m_ViewProjection, bool _fportals)
 			);
 
 		// Determine visibility for static geometry hierrarhy
-		for (u32 s_it=0; s_it<PortalTraverser.r_sectors.size(); s_it++)
+		if (psDeviceFlags.test(rsDrawStatic))
 		{
-			CSector*	sector		= (CSector*)PortalTraverser.r_sectors[s_it];
-			dxRender_Visual*	root	= sector->root();
-			for (u32 v_it=0; v_it<sector->r_frustums.size(); v_it++)	{
-				set_Frustum			(&(sector->r_frustums[v_it]));
-				add_Geometry		(root);
+			for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
+			{
+				CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
+				dxRender_Visual* root = sector->root();
+				for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++) {
+					set_Frustum(&(sector->r_frustums[v_it]));
+					add_Geometry(root);
+				}
 			}
 		}
 

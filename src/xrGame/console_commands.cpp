@@ -23,6 +23,7 @@
 #include "script_process.h"
 #include "xrServer_Objects.h"
 #include "ui/UIMainIngameWnd.h"
+#include "HUDManager.h"
 //#include "../xrphysics/PhysicsGamePars.h"
 #include "../xrphysics/iphworld.h"
 #include "string_table.h"
@@ -310,6 +311,16 @@ public:
 		xr_sprintf( str, sizeof(str), "%3.5f  (current)  [0.0,1000.0]", v );
 		tips.push_back( str );
 		IConsole_Command::fill_tips( tips, mode );
+	}
+};
+
+class CCC_UI_Reload : public IConsole_Command
+{
+public:
+	CCC_UI_Reload(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
+	virtual void Execute(LPCSTR args)
+	{
+		HUD().OnScreenResolutionChanged();// перезагружаем UI через эту команду
 	}
 };
 
@@ -1876,7 +1887,8 @@ void CCC_RegisterCommands()
 	CMD1(CCC_LoadLastSave,		"load_last_save"		);		// load last saved game from ...
 
 	CMD1(CCC_FlushLog,			"flush"					);		// flush log
-	CMD1(CCC_ClearLog,			"clear_log"					);
+	CMD1(CCC_ClearLog,			"clear_log"				);
+	CMD1(CCC_UI_Reload,			"ui_reload");
 
 #ifndef MASTER_GOLD
 	CMD1(CCC_ALifeTimeFactor,		"al_time_factor"		);		// set time factor
