@@ -27,6 +27,7 @@ _build/
 /src/*.tss
 */.vs/
 
+appdata_/
 patches/
 resources/
 import/
@@ -52,6 +53,7 @@ gamedata/sounds/heart
 gamedata/sounds/interface
 gamedata/sounds/intro
 gamedata/sounds/monsters
+gamedata/sounds/material
 gamedata/sounds/mp_actor
 gamedata/sounds/music
 gamedata/sounds/nature
