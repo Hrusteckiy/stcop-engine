@@ -3,12 +3,6 @@
 #pragma once
 
 
-#ifdef XRXMLPARSER_EXPORTS
-	#define XRXMLPARSER_API __declspec(dllexport)
-#else
-	#define XRXMLPARSER_API __declspec(dllimport)
-	#pragma comment			(lib,"xrXMLParser.lib")
-#endif
 
 const LPCSTR CONFIG_PATH			= "$game_config$";
 const LPCSTR UI_PATH				= "ui";
@@ -19,7 +13,7 @@ const LPCSTR UI_PATH				= "ui";
 typedef TiXmlNode		XML_NODE;
 typedef TiXmlAttribute	XML_ATTRIBUTE;
 
-class XRXMLPARSER_API	CXml  
+class XRCORE_API	CXml  
 {
 	void 				Load					(LPCSTR path_alias, LPCSTR xml_filename);
 public:
