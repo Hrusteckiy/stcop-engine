@@ -320,7 +320,8 @@ public:
 	CCC_UI_Reload(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
 	virtual void Execute(LPCSTR args)
 	{
-		HUD().OnScreenResolutionChanged();// перезагружаем UI через эту команду
+		if(&HUD())
+			HUD().OnScreenResolutionChanged();// перезагружаем UI через эту команду
 	}
 };
 
