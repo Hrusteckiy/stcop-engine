@@ -2,7 +2,7 @@
 
 #include "../../xrCore/XML/XMLDocument.hpp"
 
-class CUIXml :public CXml
+class CUIXml :public XMLDocument
 {
 	int						m_dbg_id;
 public:
