@@ -317,12 +317,12 @@
     <ClCompile Include="tinyxml.cpp" />
     <ClCompile Include="tinyxmlerror.cpp" />
     <ClCompile Include="tinyxmlparser.cpp" />
-    <ClCompile Include="xrXMLParser.cpp" />
+    <ClCompile Include="XMLDocument.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="tinyxml.h" />
-    <ClInclude Include="xrXMLParser.h" />
+    <ClInclude Include="XMLDocument.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\xrCore\xrCore.vcxproj">
