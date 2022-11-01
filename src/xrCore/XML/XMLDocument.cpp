@@ -56,38 +56,60 @@ void ParseFile(LPCSTR path, CMemoryWriter& W, IReader *F, XMLDocument* xml )
 	}
 }
 
-void XMLDocument::Load(LPCSTR path_alias, LPCSTR path, LPCSTR _xml_filename)
+bool XMLDocument::Load(LPCSTR path_alias, LPCSTR path, LPCSTR xml_filename, bool fatal)
 {
-	shared_str fn			= correct_file_name(path, _xml_filename);
+	shared_str fn			= correct_file_name(path, xml_filename);
 
 	string_path				str;
-	xr_sprintf					(str,"%s\\%s", path, *fn);
-	return Load				(path_alias, str);
+	xr_sprintf				(str,"%s\\%s", path, *fn);
+	return Load				(path_alias, str, fatal);
 }
 
-//инициализация и загрузка XML файла
-void XMLDocument::Load(LPCSTR path, LPCSTR  xml_filename)
+// Try to load from the first path, and if it's failed then try the second one
+bool XMLDocument::Load(LPCSTR path_alias, LPCSTR path, LPCSTR path2, LPCSTR xml_filename, bool fatal /*= true*/)
 {
-	xr_strcpy					(m_xml_file_name, xml_filename);
-	// Load and parse xml file
+	shared_str fn = correct_file_name(path, xml_filename);
 
-	IReader *F				= FS.r_open(path, xml_filename);
-	R_ASSERT2				(F,xml_filename);
+	string_path str;
+	xr_sprintf(str, "%s\\%s", path, *fn);
+	if (Load(path_alias, str, false))
+		return true;
 
-	CMemoryWriter			W;
-	ParseFile				(path, W, F, this);
-	W.w_stringZ				("");
-	FS.r_close				(F);
+	xr_sprintf(str, "%s\\%s", path2, *fn);
+	return Load(path_alias, str, fatal);
+}
 
+// Load and parse xml file
+bool XMLDocument::Load(LPCSTR path, LPCSTR xml_filename, bool fatal)
+{
+    IReader* F = FS.r_open(path, xml_filename);
+    if (!F)
+    {
+        if (fatal)
+            R_ASSERT3(F, "Can't find specified xml file", xml_filename);
+        else
+            return false;
+    }
+
+    xr_strcpy(m_xml_file_name, xml_filename);
+
+    CMemoryWriter W;
+    ParseFile(path, W, F, this);
+    W.w_stringZ("");
+    FS.r_close(F);
+	
 	m_Doc.Parse				(&m_Doc, (LPCSTR)W.pointer());
-	if (m_Doc.Error())
+
+    if (m_Doc.Error())
 	{
 		string1024			str;
-		xr_sprintf				(str, "XML file:%s value:%s errDescr:%s",m_xml_file_name,m_Doc.Value(), m_Doc.ErrorDesc());
+		xr_sprintf			(str, "XML file:%s value:%s errDescr:%s",m_xml_file_name,m_Doc.Value(), m_Doc.ErrorDesc());
 		R_ASSERT2			(false, str);
 	} 
 
 	m_root					= m_Doc.FirstChildElement();
+
+    return true;
 }
 
 XML_NODE* XMLDocument::NavigateToNode(XML_NODE* start_node, LPCSTR  path, int node_index)

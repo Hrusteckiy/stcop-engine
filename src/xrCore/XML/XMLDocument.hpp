@@ -15,14 +15,15 @@ typedef TiXmlAttribute	XML_ATTRIBUTE;
 
 class XRCORE_API	XMLDocument  
 {
-	void 				Load					(LPCSTR path_alias, LPCSTR xml_filename);
 public:
 	string_path			m_xml_file_name;
 						XMLDocument					();
 	virtual				~XMLDocument					();
 	void				ClearInternal			();
-
-	void 				Load					(LPCSTR path_alias, LPCSTR path, LPCSTR  xml_filename);
+	
+	bool 				Load					(LPCSTR path_alias, LPCSTR xml_filename, bool fatal = true);
+	bool 				Load					(LPCSTR path_alias, LPCSTR path, LPCSTR  xml_filename, bool fatal = true);
+	bool 				Load					(LPCSTR path_alias, LPCSTR path, LPCSTR path2, LPCSTR  xml_filename, bool fatal = true);
 
 
 	//чтение элементов
