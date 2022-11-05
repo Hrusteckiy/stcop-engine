@@ -79,25 +79,25 @@ bool XMLDocument::Load(LPCSTR path_alias, LPCSTR path, LPCSTR path2, LPCSTR xml_
 // Load and parse xml file
 bool XMLDocument::Load(LPCSTR path, LPCSTR xml_filename, bool fatal)
 {
-    IReader* F = FS.r_open(path, xml_filename);
-    if (!F)
-    {
-        if (fatal)
-            R_ASSERT3(F, "Can't find specified xml file", xml_filename);
-        else
-            return false;
-    }
+	IReader* F = FS.r_open(path, xml_filename);
+	if (!F)
+	{
+		if (fatal)
+			R_ASSERT3(F, "Can't find specified xml file", xml_filename);
+		else
+			return false;
+	}
 
-    xr_strcpy(m_xml_file_name, xml_filename);
+	xr_strcpy(m_xml_file_name, xml_filename);
 
-    CMemoryWriter W;
-    ParseFile(path, W, F, this);
-    W.w_stringZ("");
-    FS.r_close(F);
+	CMemoryWriter W;
+	ParseFile(path, W, F, this);
+	W.w_stringZ("");
+	FS.r_close(F);
 	
 	m_Doc.Parse				(&m_Doc, (LPCSTR)W.pointer());
 
-    if (m_Doc.Error())
+	if (m_Doc.Error())
 	{
 		string1024			str;
 		xr_sprintf			(str, "XML file:%s value:%s errDescr:%s",m_xml_file_name,m_Doc.Value(), m_Doc.ErrorDesc());
@@ -106,7 +106,7 @@ bool XMLDocument::Load(LPCSTR path, LPCSTR xml_filename, bool fatal)
 
 	m_root					= m_Doc.FirstChildElement();
 
-    return true;
+	return Set(reinterpret_cast<LPCSTR>(W.pointer()), fatal);
 }
 
 XML_NODE* XMLDocument::NavigateToNode(XML_NODE* start_node, LPCSTR  path, int node_index)
@@ -123,7 +123,7 @@ XML_NODE* XMLDocument::NavigateToNode(XML_NODE* start_node, LPCSTR  path, int no
     char *token;
 	int tmp						= 0;
 
-    //разбить путь на отдельные подпути
+    //СЂР°Р·Р±РёС‚СЊ РїСѓС‚СЊ РЅР° РѕС‚РґРµР»СЊРЅС‹Рµ РїРѕРґРїСѓС‚Рё
 	token = strtok( buf_str, seps );
 
 	if( token != NULL )
@@ -151,6 +151,25 @@ XML_NODE* XMLDocument::NavigateToNode(XML_NODE* start_node, LPCSTR  path, int no
     }
 
 	return node;
+}
+
+// XXX: support #include directive
+bool XMLDocument::Set(LPCSTR text, bool fatal)
+{
+	R_ASSERT(text != nullptr);
+	m_Doc.Parse(&m_Doc, text);
+
+	if (m_Doc.Error())
+	{
+		const bool canSkipError = IgnoringMissingEndTagError() && m_Doc.ErrorId() == TiXmlBase::TIXML_ERROR_READING_END_TAG;
+		R_ASSERT3(!fatal || canSkipError, m_Doc.ErrorDesc(), m_xml_file_name);
+		if (!canSkipError)
+			return false;
+	}
+
+	m_root = m_Doc.FirstChildElement();
+
+	return true;
 }
 
 XML_NODE* XMLDocument::NavigateToNode(LPCSTR  path, int node_index)
@@ -288,12 +307,12 @@ LPCSTR XMLDocument::ReadAttrib(XML_NODE* node, LPCSTR attrib, LPCSTR default_str
 	else
 	{
 /*
-		//обязательно делаем ref_str, а то 
-		//не сможем запомнить строку и return вернет левый указатель
+		//РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РґРµР»Р°РµРј ref_str, Р° С‚Рѕ 
+		//РЅРµ СЃРјРѕР¶РµРј Р·Р°РїРѕРјРЅРёС‚СЊ СЃС‚СЂРѕРєСѓ Рё return РІРµСЂРЅРµС‚ Р»РµРІС‹Р№ СѓРєР°Р·Р°С‚РµР»СЊ
 		shared_str result_str;
 */
 		LPCSTR result_str = NULL;
-		// Кастаем ниже по иерархии
+		// РљР°СЃС‚Р°РµРј РЅРёР¶Рµ РїРѕ РёРµСЂР°СЂС…РёРё
 
 		TiXmlElement *el = node->ToElement(); 
 		
@@ -418,7 +437,7 @@ int XMLDocument::GetNodesNum(XML_NODE* node, LPCSTR  tag_name)
 	return result;
 }
 
-//нахождение элемнета по его атрибуту
+//РЅР°С…РѕР¶РґРµРЅРёРµ СЌР»РµРјРЅРµС‚Р° РїРѕ РµРіРѕ Р°С‚СЂРёР±СѓС‚Сѓ
 XML_NODE* XMLDocument::SearchForAttribute(LPCSTR path, int index, LPCSTR tag_name, LPCSTR attrib, LPCSTR attrib_value_pattern)
 {
 	XML_NODE* start_node			= NavigateToNode(path, index);
