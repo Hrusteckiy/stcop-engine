@@ -30,6 +30,7 @@
 #	define R_CHK(expr)					do {static bool ignore_always = false; HRESULT hr = expr; if (!ignore_always && FAILED(hr)) ::Debug.error(hr,_TRE(#expr),DEBUG_INFO,ignore_always);} while(0)
 #	define R_CHK2(expr,e2)				do {static bool ignore_always = false; HRESULT hr = expr; if (!ignore_always && FAILED(hr)) ::Debug.error(hr,_TRE(#expr),_TRE(e2),DEBUG_INFO,ignore_always);} while(0)
 #	define FATAL(description)			Debug.fatal(DEBUG_INFO,description)
+#	define FATAL_F(format, ...)			Debug.fatal(DEBUG_INFO, format, __VA_ARGS__)
 
 #	ifdef VERIFY
 #		undef VERIFY
